@@ -1,0 +1,38 @@
+[Global]
+name = "Desktop"                # the fallback node_name/provider_name for later config
+api_key = 'api_key'
+
+[Global.nodes.Desktop]
+host.Ipv4 =  "127.0.0.1"
+port = 7777
+tls = false
+
+[Global.nodes.RaspberryPi]
+host.Ipv4 = "192.168.8.31"
+port = 7777
+tls = false
+
+[Global.nodes.Remote]
+host.Domain = "webman.remote.com"
+tls = true
+
+[server]  
+log_level = "normal"            # Rocket log level: Critical, Normal, Debug, Off
+react_location = "/webman/webman-cljs/resources/public/"
+limits.msgpack = "20 MiB"
+databases.webman.url = "postgres://postgres:postgres@localhost:7776/webman"
+secret_key = "secret_key"       # see https://api.rocket.rs/master/rocket/config/struct.SecretKey.html
+
+[[server.sync]]
+name= "RaspberryPi"
+interval= "600 seconds"
+
+[cli]
+log_level = "info"              # Rust log level: error, warn, info, debug, trace
+target = "RaspberryPi"
+log_file = "/webman/webman-cli/log"
+tags_file = "/webman/tags.yaml"
+
+[cli.provider.browsers.daily]   # "daily" is just an arbitrary name
+browser = "Chromium"
+

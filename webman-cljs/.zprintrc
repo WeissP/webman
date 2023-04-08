@@ -1,0 +1,8 @@
+;; -*-Clojure-*-
+{:fn-map {"fork/form" :force-nl,
+          "o/defstyled" :arg2,
+          "rf/reg-event-db" :arg1-body,
+          "rf/reg-event-fx" :arg1-body,
+          "rf/reg-sub" :arg1-pair-body},
+ :style [:community :extend-nl :fast-hang],
+ :width 75}

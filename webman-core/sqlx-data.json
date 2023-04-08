@@ -1,0 +1,432 @@
+{
+  "db": "PostgreSQL",
+  "4ee00872e16f9906c62a63f3058709a59a353308175bc0b337135ef32c42331d": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "normal",
+                  "saved",
+                  "favorite",
+                  "readlater"
+                ]
+              },
+              "name": "tag"
+            }
+          },
+          "TextArray"
+        ]
+      }
+    },
+    "query": "\nUPDATE urls SET tag = $1 WHERE url = ANY ($2::text[])\n"
+  },
+  "577e39395a02f3a770114547cdbc43dabc6077f64dcf38e99c25f83b0f14cfdb": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int2"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Varchar"
+        ]
+      }
+    },
+    "query": "\nINSERT INTO providers(provider_name) VALUES ($1)\nRETURNING id\n"
+  },
+  "662e22fc044d986cda2549f2d3990a50491d7ad045577e8b5c4de6b0981dc228": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int4"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "TextArray",
+          "TextArray"
+        ]
+      }
+    },
+    "query": "\nINSERT INTO urls(url,title)\nSELECT * FROM UNNEST($1::text[],$2::text[])\nON CONFLICT (url) DO UPDATE SET title = EXCLUDED.title\nRETURNING id\n"
+  },
+  "7d2cf07b88a87cf956b89fe6b019c724b4496dc576f751b8689bd3dae3c3a56d": {
+    "describe": {
+      "columns": [
+        {
+          "name": "tag!:UrlTag",
+          "ordinal": 0,
+          "type_info": {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "normal",
+                  "saved",
+                  "favorite",
+                  "readlater"
+                ]
+              },
+              "name": "tag"
+            }
+          }
+        },
+        {
+          "name": "array_agg",
+          "ordinal": 1,
+          "type_info": "TextArray"
+        }
+      ],
+      "nullable": [
+        false,
+        null
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "\nSELECT tag as \"tag!:UrlTag\", array_agg(url)\nFROM urls\nWHERE tag != 'normal'\nGROUP BY tag\n"
+  },
+  "94ff520f274034082e3c669ad4d245eb1b31ea1b9d1663929c1c8b8ab0d11385": {
+    "describe": {
+      "columns": [
+        {
+          "name": "number",
+          "ordinal": 0,
+          "type_info": "Int4"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": [
+          "Int2",
+          {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "chromium",
+                  "chrome",
+                  "safari",
+                  "firefox"
+                ]
+              },
+              "name": "browser"
+            }
+          },
+          "Int4Array",
+          "Int4Array",
+          "TimestampArray"
+        ]
+      }
+    },
+    "query": "\nSELECT upsert_visits($1,$2::browser, $3,$4,$5) as number;\n"
+  },
+  "aa32f857f5271ba3dc60cd7f2c600a554bba9d7285922812088480c5190ca0d1": {
+    "describe": {
+      "columns": [
+        {
+          "name": "url!",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "title!",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "tag!:_",
+          "ordinal": 2,
+          "type_info": {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "normal",
+                  "saved",
+                  "favorite",
+                  "readlater"
+                ]
+              },
+              "name": "tag"
+            }
+          }
+        },
+        {
+          "name": "privacy!:_",
+          "ordinal": 3,
+          "type_info": {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "normal",
+                  "private"
+                ]
+              },
+              "name": "privacy"
+            }
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int2",
+          {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "chromium",
+                  "chrome",
+                  "safari",
+                  "firefox"
+                ]
+              },
+              "name": "browser"
+            }
+          },
+          {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "normal",
+                  "private"
+                ]
+              },
+              "name": "privacy"
+            }
+          },
+          "Timestamp",
+          "Timestamp",
+          "TextArray",
+          "TextArray",
+          {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "normal",
+                  "saved",
+                  "favorite",
+                  "readlater"
+                ]
+              },
+              "name": "tag"
+            }
+          },
+          "Int8"
+        ]
+      }
+    },
+    "query": "\nWITH grouped_visits AS (\nSELECT url_id, SUM(visit_count) as visit_count, MAX(last_visit_time) as last_visit_time\nFROM visits\nWHERE ($1::smallint is null OR provider_id = $1)\n  AND ($2::browser is null OR browser_type = $2) \nGROUP BY url_id\nHAVING ($4::timestamp is null OR MAX(last_visit_time) >= $4) \n  AND ($5::timestamp is null OR MAX(last_visit_time) <= $5) \n) SELECT url as \"url!\", title as \"title!\", tag as \"tag!:_\", privacy as \"privacy!:_\"\nFROM urls INNER JOIN grouped_visits ON urls.id = grouped_visits.url_id \nWHERE ($3::privacy is null OR privacy = $3)\n  AND url ILIKE ALL ($6::text[]) \n  AND title ILIKE ALL ($7::text[]) \n  AND ($8::tag is null OR tag = $8)\nORDER BY tag DESC, last_visit_time DESC, visit_count DESC\nlimit $9\n"
+  },
+  "b9207661504a8f43b5ccc2b56cb133b4d8d641699eb96a16de03bccd3e4fa359": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int2"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "\nSELECT id\nFROM providers\nWHERE provider_name = $1\n"
+  },
+  "bae3292cdf15e2f7226a5c426a6cbee315efdd354b3c2a72f6635a5636c7047d": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int2"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Timestamp",
+          "Int2"
+        ]
+      }
+    },
+    "query": "\nUPDATE providers SET last_import_time = $1 WHERE id = $2\nRETURNING id\n"
+  },
+  "bd8d09bcb2e1c0133b79d4b65cc10b9f639b6cf348cc3fe79cdca8d0b5f9141d": {
+    "describe": {
+      "columns": [
+        {
+          "name": "name",
+          "ordinal": 0,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "last_import_time",
+          "ordinal": 1,
+          "type_info": "Timestamp"
+        }
+      ],
+      "nullable": [
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "\nSELECT provider_name as name, last_import_time\nFROM providers\n"
+  },
+  "c8a555c7a4dede0b42350bec2c3c777d1df7b7670269a3359f8986a383595a98": {
+    "describe": {
+      "columns": [
+        {
+          "name": "url",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "title",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "visit_count",
+          "ordinal": 2,
+          "type_info": "Int4"
+        },
+        {
+          "name": "last_visit_time",
+          "ordinal": 3,
+          "type_info": "Timestamp"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int2",
+          "Timestamp",
+          {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "chromium",
+                  "chrome",
+                  "safari",
+                  "firefox"
+                ]
+              },
+              "name": "browser"
+            }
+          }
+        ]
+      }
+    },
+    "query": "\nSELECT url, title, visit_count, last_visit_time\nFROM urls INNER JOIN visits ON urls.id = visits.url_id  \nWHERE provider_id = $1 AND last_visit_time > $2 AND browser_type = $3\n"
+  },
+  "e8699a88568c398aac9a212de67605748257cdf6bda0edd8fa26544ce29c04ef": {
+    "describe": {
+      "columns": [
+        {
+          "name": "last_import_time",
+          "ordinal": 0,
+          "type_info": "Timestamp"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "\nSELECT last_import_time\nFROM providers\nWHERE provider_name = $1\n"
+  },
+  "e9d41e6b33238c300977aa2f05927c6bdb8fec6dda4ca87ff922eec81e8d65a0": {
+    "describe": {
+      "columns": [
+        {
+          "name": "time",
+          "ordinal": 0,
+          "type_info": "Timestamp"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": [
+          "Int2"
+        ]
+      }
+    },
+    "query": "\nSELECT MAX(last_visit_time) as time\nFROM visits\nWHERE provider_id = $1\n"
+  },
+  "f90caad1c1348ac946a12ee4bec04ecf20037a53e0493c928dfbbfa626eb44e6": {
+    "describe": {
+      "columns": [
+        {
+          "name": "browser: Browser",
+          "ordinal": 0,
+          "type_info": {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "chromium",
+                  "chrome",
+                  "safari",
+                  "firefox"
+                ]
+              },
+              "name": "browser"
+            }
+          }
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int2"
+        ]
+      }
+    },
+    "query": "\nSELECT DISTINCT browser_type as \"browser: Browser\"\nFROM visits\nWHERE provider_id = $1\n"
+  }
+}

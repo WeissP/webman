@@ -1,0 +1,7 @@
+[workspace]
+members = [
+"webman-core",
+"webman-server",
+"webman-cli",
+]
+
