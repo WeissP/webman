@@ -17,6 +17,20 @@
         rustPkgs = pkgs.rustBuilder.makePackageSet {
           rustVersion = "1.66.1";
           packageFun = import ./Cargo.nix;
+          # Use the existing all list of overrides and append your override
+          packageOverrides = pkgs:
+            pkgs.rustBuilder.overrides.all ++ [
+              (pkgs.rustBuilder.rustLib.makeOverride {
+                name = "sqlx-macros";
+                overrideAttrs = drv: {
+                  propagatedBuildInputs = with pkgs;
+                    drv.propagatedBuildInputs or [ ]
+                    ++ (lib.optional stdenv.isDarwin
+                      (with darwin.apple_sdk.frameworks;
+                        [ SystemConfiguration ]));
+                };
+              })
+            ];
         };
 
       in rec {
