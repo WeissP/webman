@@ -9,8 +9,11 @@ use std::{
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Clone)]
 pub enum Host {
+    #[serde(alias = "domain")]
     Domain(String),
+    #[serde(alias = "ipv4")]
     Ipv4(Ipv4Addr),
+    #[serde(alias = "ipv6")]
     Ipv6(Ipv6Addr),
 }
 
