@@ -26,8 +26,9 @@ impl Browser {
         let mut home = dirs::home_dir().expect("error detecting home dir");
         home.push(match (self, OS) {
             (Browser::Chromium, "linux") => ".config/chromium/Default/History",
+            (Browser::Chromium, "macos") => "Library/Application Support/Chromium/Default/History",
             (Browser::Safari, "macos") => "Library/Safari/History.db",
-            _ => todo!(),
+            (b, os) => panic!("Browser {:?} is not yet supported on {os}", b),
         });
         home.into_os_string()
             .into_string()
