@@ -49,14 +49,6 @@
             ]
           else
             [ ]);
-
-          # RUST_BACKTRACE = 1;
-          # CC_LOG_LEVEL = "trace";
-          CC_LOG_LEVEL = "debug";
-          CC_INSTANCES_LOCATION = if stdenv.isDarwin then
-            "/Users/bozhoubai/projects/coin-change/instances"
-          else
-            "/home/weiss/projects/coin-change/instances";
         };
         packages = {
           webman-cli = (rustPkgs.workspace.webman-cli { }).bin;

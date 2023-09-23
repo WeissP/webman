@@ -39,7 +39,10 @@ impl BrowserSetting {
             }
             Browser::Safari => {
                 let conn = Safari.establish_connection(&loc).with_context(|| {
-                    format!("could not connect to {:?} browser db", self.browser)
+                    format!(
+                        "could not connect to {:?} browser db with location: {}",
+                        self.browser, loc
+                    )
                 })?;
                 last_import_time = Some(Safari.last_import_time(&conn)?);
                 Safari.mine_urls(&conn, since)
