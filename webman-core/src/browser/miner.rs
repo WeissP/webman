@@ -1,5 +1,8 @@
 mod chromium;
 mod safari;
+mod vivaldi;
+
+use self::vivaldi::Vivaldi;
 
 use super::Browser;
 use crate::{url::Url, web::resp::UrlInsert, ToOk};
@@ -36,6 +39,13 @@ impl BrowserSetting {
                     format!("could not connect to {:?} browser db", self.browser)
                 })?;
                 Chromium.mine_urls(&conn, since)
+            }
+            Browser::Vivaldi => {
+                let vi = Vivaldi::default();
+                let conn = vi.establish_connection(&loc).with_context(|| {
+                    format!("could not connect to {:?} browser db", self.browser)
+                })?;
+                vi.mine_urls(&conn, since)
             }
             Browser::Safari => {
                 let conn = Safari.establish_connection(&loc).with_context(|| {

@@ -4,6 +4,7 @@ use anyhow::Result;
 use chrono::NaiveDateTime;
 use rusqlite::Connection;
 
+#[derive(Default, Debug)]
 pub struct Chromium;
 
 const CHROME_UNIX_DIFF: i64 = 11644473600;

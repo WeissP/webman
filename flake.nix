@@ -3,6 +3,8 @@
     cargo2nix.url = "github:cargo2nix/cargo2nix/unstable";
     flake-utils.follows = "cargo2nix/flake-utils";
     nixpkgs.follows = "cargo2nix/nixpkgs";
+    devshell.url = "github:numtide/devshell";
+    rust-overlay.url = "github:oxalica/rust-overlay";
   };
 
   outputs = inputs:
@@ -11,7 +13,11 @@
       let
         pkgs = import nixpkgs {
           inherit system;
-          overlays = [ cargo2nix.overlays.default ];
+          overlays = [
+            cargo2nix.overlays.default
+            devshell.overlays.default
+            (import rust-overlay)
+          ];
         };
 
         rustPkgs = pkgs.rustBuilder.makePackageSet {
@@ -34,21 +40,26 @@
         };
 
       in with pkgs; rec {
-        devShells.default = mkShell {
-          buildInputs = [
-            pkg-config
-            rust-analyzer
-            rust-bin.nightly."2023-01-01".default
-            cargo-limit
-          ] ++ (if stdenv.isDarwin then
-            with darwin.apple_sdk.frameworks; [
-              IOKit
-              Security
-              CoreServices
-              SystemConfiguration
-            ]
-          else
-            [ ]);
+        devShells.default = pkgs.devshell.mkShell {
+          imports = map pkgs.devshell.importTOML [ ./devshell.toml ];
+          packages = with pkgs;
+            [ rust-bin.stable."1.66.1".default ] ++ (if stdenv.isDarwin then
+              with darwin.apple_sdk.frameworks; [
+                IOKit
+                Security
+                CoreServices
+                SystemConfiguration
+              ]
+            else [
+              gcc
+              openssl
+              libiconv
+              pkg-config
+            ]);
+          env = [{
+            name = "PKG_CONFIG_PATH";
+            value = "${pkgs.openssl.dev}/lib/pkgconfig";
+          }];
         };
         packages = {
           webman-cli = (rustPkgs.workspace.webman-cli { }).bin;
