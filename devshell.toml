@@ -1,0 +1,8 @@
+[devshell]
+packages = [
+   "cargo-limit",
+   "rust-analyzer",
+   "cargo-expand",
+   "nodePackages.http-server",
+]
+
