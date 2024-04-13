@@ -49,7 +49,7 @@
   (fn [_ _]
     {:http-xhrio {:method :get,
                   :uri (api+ "sync"),
-                  :timeout 5000,
+                  :timeout 500000,
                   :response-format (ajax/text-response-format),
                   :on-success [::notification "successfully synchronized"
                                :success],
