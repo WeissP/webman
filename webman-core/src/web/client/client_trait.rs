@@ -34,8 +34,9 @@ where
     .await
     .with_context(|| {
         format!(
-            "error converting body of type {}",
-            std::any::type_name::<T>()
+            "error converting body of type {} via endpoint {}",
+            std::any::type_name::<T>(),
+            end_point
         )
     })
 }
@@ -145,6 +146,7 @@ pub trait ClientTrait: 'static + Send + Sync {
         // (host import time, remote import time)
         let mut hm = std::collections::HashMap::<String, (NaiveDateTime, NaiveDateTime)>::new();
 
+        log::debug!("getting provider info of host {:?}", host);
         // insert host to hashmap
         for Provider {
             name,
@@ -154,6 +156,7 @@ pub trait ClientTrait: 'static + Send + Sync {
             hm.insert(name, (last_import_time, unix));
         }
 
+        log::debug!("getting provider info of remote {:?}", remote);
         // update remote import time to hashmap
         for Provider {
             name,
