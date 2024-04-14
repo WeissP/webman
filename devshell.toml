@@ -6,3 +6,10 @@ packages = [
    "nodePackages.http-server",
 ]
 
+[serviceGroups.rustdoc]
+description = "show rust doc as a web server"
+[serviceGroups.rustdoc.services.cratedocs]
+command = "pushd $PRJ_ROOT && cargo doc && http-server $PRJ_ROOT/target/doc/ -p 10008"
+[serviceGroups.rustdoc.services.stddocs]
+command = "http-server $(rustc --print sysroot)/share/doc/rust/html -p 10007"
+
