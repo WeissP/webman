@@ -22,7 +22,7 @@
           ];
         };
         extraBuildInputs = with pkgs;
-          if stdenv.isDarwin then
+          [ libiconv pkg-config ] ++ (if stdenv.isDarwin then
             with darwin.apple_sdk.frameworks; [
               IOKit
               Security
@@ -32,9 +32,7 @@
           else [
             gcc
             openssl
-            libiconv
-            pkg-config
-          ];
+          ]);
       in {
         devShells.default = pkgs.devshell.mkShell {
           imports = map pkgs.devshell.importTOML [ ./devshell.toml ];
