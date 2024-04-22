@@ -2728,7 +2728,6 @@ dependencies = [
  "serde_json",
  "serde_yaml",
  "serial_test",
- "simplelog",
  "sqlx",
  "sqlx-database-tester",
  "strum",

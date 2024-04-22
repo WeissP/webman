@@ -19,6 +19,11 @@ async fn main() -> Result<(), rocket::Error> {
             let mut interval = time::interval(n.interval);
             loop {
                 interval.tick().await;
+                log::debug!(
+                    "Syncing nodes between host {} and {}",
+                    host.as_str(),
+                    &n.name
+                );
                 client.sync_all(host, &n.name).await.to_ok();
             }
         });
