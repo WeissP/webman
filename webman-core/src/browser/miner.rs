@@ -1,8 +1,9 @@
 mod chromium;
+mod firefox;
 mod safari;
 mod vivaldi;
 
-use self::vivaldi::Vivaldi;
+use self::{firefox::Firefox, vivaldi::Vivaldi};
 
 use super::Browser;
 use crate::{url::Url, web::resp::UrlInsert, ToOk};
@@ -58,7 +59,12 @@ impl BrowserSetting {
                 Safari.mine_urls(&conn, since)
             }
             Browser::Chrome => todo!(),
-            Browser::Firefox => todo!(),
+            Browser::Firefox => {
+                let conn = Firefox.establish_connection(&loc).with_context(|| {
+                    format!("could not connect to {:?} browser db", self.browser)
+                })?;
+                Firefox.mine_urls(&conn, since)
+            }
         }?;
         if urls.is_empty() {
             info!("no new urls found");

@@ -26,6 +26,12 @@ pub trait ToOk<T, E> {
         F: FnOnce() -> C;
 }
 
+fn xx() -> () {
+    let s = 1;
+    let x = 2;
+    todo!()
+}
+
 impl<T, E: Display> ToOk<T, E> for Result<T, E> {
     fn to_ok(self) -> Option<T> {
         match self {
