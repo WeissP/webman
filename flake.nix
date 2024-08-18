@@ -65,7 +65,7 @@
         };
         packages =
           let
-            craneLib = crane.lib.${system};
+            craneLib = crane.mkLib nixpkgs.legacyPackages.${system};
             sqlxFilter =
               path: _type:
               null != builtins.match ".*sql$" path
