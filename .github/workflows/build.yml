@@ -19,4 +19,4 @@ jobs:
       run: nix build .#webman-cli
     - name: Build webman-server
       run: nix build .#webman-server
-    - run: nix-shell --run "echo OK"
+
