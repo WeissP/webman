@@ -1,8 +1,10 @@
 [devshell]
+motd = ""
 packages = [
-   "cargo-limit",
-   "cargo-expand",
-   "nodePackages.http-server",
+  "cargo-limit",
+  "cargo-expand",
+  "nodePackages.http-server",
+  "sqlx-cli",
 ]
 
 [serviceGroups.rustdoc]
@@ -11,4 +13,3 @@ description = "show rust doc as a web server"
 command = "pushd $PRJ_ROOT && cargo doc && http-server $PRJ_ROOT/target/doc/ -p 10008"
 [serviceGroups.rustdoc.services.stddocs]
 command = "http-server $(rustc --print sysroot)/share/doc/rust/html -p 10007"
-
