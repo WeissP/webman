@@ -33,3 +33,4 @@ target/
 frag-master.tex
 frag-master.el
 log
+.aider*
