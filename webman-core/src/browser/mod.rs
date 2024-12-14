@@ -18,6 +18,7 @@ pub enum Browser {
     Safari,
     Firefox,
     Vivaldi,
+    Floorp,
 }
 
 #[cfg(feature = "browser")]

@@ -1,5 +1,6 @@
 mod chromium;
 mod firefox;
+mod floorp;
 mod safari;
 mod vivaldi;
 
@@ -9,6 +10,7 @@ use super::Browser;
 use crate::{url::Url, web::resp::UrlInsert, ToOk};
 use anyhow::{Context, Result};
 use chrono::NaiveDateTime;
+use floorp::Floorp;
 use log::info;
 use rusqlite::{types::FromSql, Connection, OpenFlags, ToSql};
 use serde::{Deserialize, Serialize};
@@ -64,6 +66,13 @@ impl BrowserSetting {
                     format!("could not connect to {:?} browser db", self.browser)
                 })?;
                 Firefox.mine_urls(&conn, since)
+            }
+            Browser::Floorp => {
+                let fl = Floorp::default();
+                let conn = fl.establish_connection(&loc).with_context(|| {
+                    format!("could not connect to {:?} browser db", self.browser)
+                })?;
+                fl.mine_urls(&conn, since)
             }
         }?;
         if urls.is_empty() {
